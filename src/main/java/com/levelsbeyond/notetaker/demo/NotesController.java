@@ -24,12 +24,11 @@ import com.levelsbeyond.notetaker.demo.services.NotesService;
 @RestController
 @Component
 
-//Ideally, I would let this class implement an interface
-
+//Ideally, I would let this class implement an interface containing these methods
+//One reason for this being it can be mocked for testing
 public class NotesController {
-    private final AtomicLong counter = new AtomicLong();
     
-    @Autowired
+	@Autowired
     NotesService notesService;
     
     @RequestMapping(value="/api/notes", method=RequestMethod.GET)
@@ -44,11 +43,37 @@ public class NotesController {
     }
     
     @RequestMapping(value="/api/notes/{id}", method=RequestMethod.GET)
-    public List<Note> getNoteById(@PathVariable Long id) {
-        List<Note> allNotes = notesService.getAllNotes();
-        return allNotes;
+    public Note getNoteById(@PathVariable Long id) {
+    	return notesService.getNoteById(id);
+    }
+    
+    
+    @RequestMapping(value="/api/notes/{id}", method=RequestMethod.POST)
+    public void updateNote(@PathVariable Long id, @RequestBody String note) {
+    	ObjectMapper mapper = new ObjectMapper();
+        Note savedNote = null;
+        JsonNode noteBody;
+		try {
+			noteBody = mapper.readTree(note);
+			String body = noteBody.get("body").asText();
+			int success = notesService.update(id, body);
+	    	if(success==1) {
+	    		return;
+	    	}
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
     }
 
+    @RequestMapping(value="/api/notes/{id}", method=RequestMethod.DELETE)
+    public int delete(@PathVariable Long id) {
+        return notesService.delete(id);
+    }
+    
     @RequestMapping(value="/api/notes", method=RequestMethod.POST)
     public Note saveNote(@RequestBody String note) {
         ObjectMapper mapper = new ObjectMapper();

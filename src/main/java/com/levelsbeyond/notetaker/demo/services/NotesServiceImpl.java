@@ -35,5 +35,15 @@ public class NotesServiceImpl implements NotesService {
 	public Note save(String note) {
 		return notesRepo.save(new Note(note));
 	}
+	
+	@Override
+	public int update(Long id, String body) {
+		return notesRepo.updateNote(new Long(1), body);
+	}
+
+	@Override
+	public int delete(Long id) {
+		return notesRepo.deleteNote(id);
+	}
 
 }

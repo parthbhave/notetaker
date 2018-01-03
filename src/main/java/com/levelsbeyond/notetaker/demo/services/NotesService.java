@@ -14,4 +14,8 @@ public interface NotesService {
 
 	Note save(String note);
 
+	int update(Long id, String body);
+	
+	int delete(Long id);
+	
 }
